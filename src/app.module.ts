@@ -6,14 +6,18 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { ActivitiesModule } from './activities/activities.module';
 
+import { GenresModule } from './genres/genres.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MoviesModule,
     MongooseModule.forRoot(process.env.MONGO_URI),
+
+    GenresModule,
     AuthModule,
+    MoviesModule,
     UsersModule,
     ActivitiesModule,
   ],

@@ -8,10 +8,9 @@ const StringSchema = {
 export const Movie = new mongoose.Schema({
   title: StringSchema,
   year: StringSchema,
-  image: {
-    name: StringSchema,
-    data: StringSchema,
-  },
+  image: StringSchema,
+  mobileImage: StringSchema,
+  trailer: StringSchema,
   featured: {
     type: Boolean,
     default: false,
@@ -20,10 +19,7 @@ export const Movie = new mongoose.Schema({
     {
       name: StringSchema,
       asCharacter: StringSchema,
-      image: {
-        name: StringSchema,
-        data: StringSchema,
-      },
+      image: StringSchema,
     },
   ],
   rank: {
@@ -38,5 +34,10 @@ export const Movie = new mongoose.Schema({
   },
   genres: [StringSchema],
   plot: StringSchema,
-  similar: [StringSchema],
+  similar: [
+    {
+      image: StringSchema,
+      title: StringSchema,
+    },
+  ],
 });

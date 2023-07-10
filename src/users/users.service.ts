@@ -62,6 +62,9 @@ export class UsersService {
     }
 
     return {
+      user: {
+        image: validEmail.image,
+      },
       access_token: this.jwtService.sign({
         id: validEmail._id,
         role: validEmail.role,

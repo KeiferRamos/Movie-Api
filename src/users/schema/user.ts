@@ -10,10 +10,7 @@ export const User = new mongoose.Schema({
   password: StringSchema,
   contactNumber: StringSchema,
   email: StringSchema,
-  image: {
-    name: StringSchema,
-    data: StringSchema,
-  },
+  image: StringSchema,
   bio: String,
   role: {
     type: String,

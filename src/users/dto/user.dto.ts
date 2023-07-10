@@ -32,9 +32,9 @@ export class userDto {
   @IsOptional()
   contactNumber: string;
 
-  @ValidateObject(imageValue)
+  @IsString()
   @IsOptional()
-  image: Object;
+  image: string;
 
   @IsEmail()
   email: string;

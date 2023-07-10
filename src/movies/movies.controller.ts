@@ -6,17 +6,13 @@ import {
   Param,
   Post,
   Put,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { CreateMovieDTO } from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 import { MoviesService } from './movies.service';
 
-@UseGuards(JwtAuthGuard)
 @Controller('movies')
 export class MoviesController {
   constructor(private movieService: MoviesService) {}
@@ -25,6 +21,7 @@ export class MoviesController {
     return this.movieService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('create')
   createMovie(@Body() body: CreateMovieDTO): Promise<Movie> {
     return this.movieService.create(body);
@@ -35,6 +32,7 @@ export class MoviesController {
     return this.movieService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   updateMovie(
     @Param('id') id: string,
@@ -43,11 +41,13 @@ export class MoviesController {
     return this.movieService.update(id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   deleteMovieById(@Param('id') id: string): Promise<Movie> {
     return this.movieService.delete(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/cast/:id')
   addCast(@Param('id') id: string, @Body() body) {
     return this.movieService.add(id, body);

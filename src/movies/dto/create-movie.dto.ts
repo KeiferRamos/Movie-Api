@@ -7,8 +7,6 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { imageValue } from 'src/users/constant';
-import { ValidateObject } from 'src/users/decorator/decorator';
 
 export class CastDto {
   @IsString()
@@ -17,8 +15,8 @@ export class CastDto {
   @IsString()
   asCharacter: string;
 
-  @ValidateObject(imageValue)
-  image: Object;
+  @IsString()
+  image: string;
 }
 
 class RankDto {
@@ -39,8 +37,16 @@ export class CreateMovieDTO {
   @IsString()
   plot: string;
 
-  @ValidateObject(imageValue)
-  image: Object;
+  @IsString()
+  trailer: string;
+
+  @IsString()
+  @IsOptional()
+  image: string;
+
+  @IsString()
+  @IsOptional()
+  mobileImage: string;
 
   @IsBoolean()
   @IsOptional()
@@ -61,6 +67,5 @@ export class CreateMovieDTO {
 
   @IsArray()
   @IsOptional()
-  @IsString({ each: true })
-  similar: string[];
+  similar: [];
 }

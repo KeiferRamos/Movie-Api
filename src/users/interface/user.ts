@@ -4,10 +4,7 @@ export interface User {
   contactNumber: string;
   email: string;
   role: string;
-  image: {
-    name: string;
-    data: string;
-  };
+  image: string;
   bio: string;
   address: {
     blockNumber: string;

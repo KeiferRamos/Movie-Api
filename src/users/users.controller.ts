@@ -43,13 +43,11 @@ export class UsersController {
     return this.userService.delete(id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   getAllUser() {
     return this.userService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.userService.findById(id);
