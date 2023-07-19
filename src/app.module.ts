@@ -13,8 +13,7 @@ import { GenresModule } from './genres/genres.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
-
+    MongooseModule.forRoot(process.env.MONGO_URI, { dbName: 'MovieDB' }),
     GenresModule,
     AuthModule,
     MoviesModule,
