@@ -7,16 +7,6 @@ import mongoose from 'mongoose';
 
 const PORT = process.env.PORT || 3000;
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-};
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(`${__dirname}/public`);
@@ -24,7 +14,6 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  await connectDB();
   await app.listen(PORT);
 }
 bootstrap();
