@@ -3,19 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as mongoose from 'mongoose';
 
 const PORT = process.env.PORT || 3000;
-
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.log(error);
-    process.exit(1);
-  }
-};
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -27,6 +16,4 @@ async function bootstrap() {
   await app.listen(PORT);
 }
 
-connectDB().then(async () => {
-  bootstrap();
-});
+bootstrap();
