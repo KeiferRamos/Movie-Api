@@ -52,4 +52,29 @@ export class MoviesController {
   addCast(@Param('id') id: string, @Body() body) {
     return this.movieService.add(id, body);
   }
+
+  @Put('/reviews/create/:id')
+  addReview(@Param('id') id: string, @Body() body) {
+    return this.movieService.addReview(id, body);
+  }
+
+  @Put('/reviews/delete/:id')
+  deleteReview(@Param('id') id: string, @Body() body) {
+    return this.movieService.deleteReview(id, body.reviewid);
+  }
+
+  @Put('/reviews/edit/:id')
+  editReview(@Param('id') id: string, @Body() body) {
+    return this.movieService.editReview(id, body);
+  }
+
+  @Put('/likes/:id')
+  addLike(@Param('id') id, @Body() body) {
+    return this.movieService.like(id, body.username);
+  }
+
+  @Put('/dislikes/:id')
+  removeLike(@Param('id') id, @Body() body) {
+    return this.movieService.dislike(id, body.username);
+  }
 }

@@ -7,7 +7,7 @@ const StringSchema = {
 
 export const Movie = new mongoose.Schema({
   title: StringSchema,
-  year: StringSchema,
+  year: Number,
   image: StringSchema,
   mobileImage: StringSchema,
   trailer: StringSchema,
@@ -15,6 +15,21 @@ export const Movie = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  likes: [String],
+  reviews: [
+    {
+      type: new mongoose.Schema(
+        {
+          username: String,
+          userImage: String,
+          title: String,
+          review: String,
+          stars: Number,
+        },
+        { timestamps: true },
+      ),
+    },
+  ],
   cast: [
     {
       name: StringSchema,

@@ -3,10 +3,17 @@ export interface Movie {
   year: string;
   image: string;
   mobileImage: string;
+  likes: string[];
   rank: {
     isRanked: boolean;
     rankNumber: number;
   };
+  reviews: {
+    username: string;
+    userImage: string;
+    review: string;
+    title: string;
+  }[];
   featured: boolean;
   trailer: string;
   cast: {
