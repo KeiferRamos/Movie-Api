@@ -20,9 +20,9 @@ export class GenresController {
     return this.genreService.findAll();
   }
 
-  @Get(':id')
-  getGenreById(@Param('id') id: string) {
-    return this.genreService.findById(id);
+  @Get(':name')
+  getGenreById(@Param('name') name: string) {
+    return this.genreService.findById(name);
   }
 
   @Post()

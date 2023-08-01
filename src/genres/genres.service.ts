@@ -12,8 +12,8 @@ export class GenresService {
     return this.genreModel.find();
   }
 
-  findById(id: string) {
-    return this.genreModel.findById(id);
+  findById(name: string) {
+    return this.genreModel.findOne({ name });
   }
 
   update(id: string, body: GenreDto) {
