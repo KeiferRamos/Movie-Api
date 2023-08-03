@@ -27,6 +27,7 @@ export interface Movie {
     {
       image: string;
       title: string;
+      movieId: string;
     },
   ];
 }

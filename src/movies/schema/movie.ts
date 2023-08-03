@@ -53,6 +53,7 @@ export const Movie = new mongoose.Schema({
     {
       image: StringSchema,
       title: StringSchema,
+      movieId: StringSchema,
     },
   ],
 });

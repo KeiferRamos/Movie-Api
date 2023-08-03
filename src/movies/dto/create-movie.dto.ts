@@ -31,8 +31,8 @@ export class CreateMovieDTO {
   @IsString()
   title: string;
 
-  @IsNumberString()
-  year: string;
+  @IsNumber()
+  year: number;
 
   @IsString()
   plot: string;
