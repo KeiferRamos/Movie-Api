@@ -52,8 +52,26 @@ export const Movie = new mongoose.Schema({
   similar: [
     {
       image: StringSchema,
+      featured: {
+        type: Boolean,
+        default: false,
+      },
+      year: Number,
+      mobileImage: StringSchema,
+      likes: [String],
       title: StringSchema,
       movieId: StringSchema,
+      genres: [StringSchema],
+      rank: {
+        isRanked: {
+          type: Boolean,
+          default: false,
+        },
+        rankNumber: {
+          type: Number,
+          default: 0,
+        },
+      },
     },
   ],
 });

@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
@@ -17,8 +18,8 @@ import { MoviesService } from './movies.service';
 export class MoviesController {
   constructor(private movieService: MoviesService) {}
   @Get()
-  getAllMovies(): Promise<Movie[]> {
-    return this.movieService.findAll();
+  getAllMovies(@Query() query): Promise<Movie[]> {
+    return this.movieService.findAll(query);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -30,6 +31,11 @@ export class MoviesController {
   @Get(':id')
   getMovieById(@Param('id') id: string): Promise<Movie> {
     return this.movieService.findById(id);
+  }
+
+  @Get('/similar/:id')
+  getSimilar(@Param('id') id: string) {
+    return this.movieService.findSimilar(id);
   }
 
   @UseGuards(JwtAuthGuard)

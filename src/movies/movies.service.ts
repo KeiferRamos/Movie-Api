@@ -12,8 +12,27 @@ export class MoviesService {
     return this.movieModel.create({ ...body });
   }
 
-  findAll() {
-    return this.movieModel.find();
+  findAll(query) {
+    const { limit, ...rest } = query;
+    return this.movieModel
+      .find(
+        { ...rest },
+        {
+          reviews: 0,
+          similar: 0,
+          plot: 0,
+          trailer: 0,
+          cast: 0,
+        },
+      )
+      .limit(parseInt(limit));
+  }
+
+  findSimilar(id: string) {
+    return this.movieModel.find(
+      { _id: { $ne: id } },
+      { reviews: 0, similar: 0, plot: 0, trailer: 0, cast: 0 },
+    );
   }
 
   findById(id: string) {

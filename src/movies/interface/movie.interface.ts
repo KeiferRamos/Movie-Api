@@ -23,11 +23,27 @@ export interface Movie {
   }[];
   plot: string;
   genres: string[];
-  similar: [
-    {
-      image: string;
-      title: string;
-      movieId: string;
-    },
-  ];
+  similar: {
+    image: string;
+    featured: {
+      type: boolean;
+      default: false;
+    };
+    year: number;
+    mobileImage: string;
+    likes: string[];
+    title: string;
+    movieId: string;
+    genres: string[];
+    rank: {
+      isRanked: {
+        type: boolean;
+        default: false;
+      };
+      rankNumber: {
+        type: number;
+        default: 0;
+      };
+    };
+  }[];
 }
