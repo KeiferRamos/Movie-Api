@@ -23,7 +23,6 @@ class RankDto {
   @IsBoolean()
   isRanked: boolean;
 
-  @IsNumberString()
   rankNumber: number;
 }
 
@@ -31,8 +30,6 @@ export class CreateMovieDTO {
   @IsString()
   title: string;
 
-  @IsNumberString()
-  @IsNumber()
   year: number;
 
   @IsString()
