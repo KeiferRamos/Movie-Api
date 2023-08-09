@@ -18,8 +18,8 @@ import { MoviesService } from './movies.service';
 export class MoviesController {
   constructor(private movieService: MoviesService) {}
   @Get()
-  getAllMovies(@Query() query): Promise<Movie[]> {
-    return this.movieService.findAll(query);
+  getAllMovies(@Query() query, @Body() body): Promise<Movie[]> {
+    return this.movieService.findAll(query, body);
   }
 
   @UseGuards(JwtAuthGuard)

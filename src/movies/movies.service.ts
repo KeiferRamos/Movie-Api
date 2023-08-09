@@ -12,19 +12,23 @@ export class MoviesService {
     return this.movieModel.create({ ...body });
   }
 
-  findAll(query) {
+  findAll(query, body) {
     const { limit, skip, ...rest } = query;
+
+    let includedKeys = {};
+
+    Object.keys(body).forEach((key) => {
+      if (typeof body[key] === 'object') {
+        Object.keys(body[key]).forEach((itemKey) => {
+          includedKeys[`${key}.${itemKey}`] = 1;
+        });
+      } else {
+        includedKeys[key] = 1;
+      }
+    });
+
     return this.movieModel
-      .find(
-        { ...rest },
-        {
-          reviews: 0,
-          similar: 0,
-          plot: 0,
-          trailer: 0,
-          cast: 0,
-        },
-      )
+      .find({ ...rest }, includedKeys)
       .skip(parseInt(skip))
       .limit(parseInt(limit));
   }

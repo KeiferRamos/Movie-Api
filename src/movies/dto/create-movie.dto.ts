@@ -32,6 +32,7 @@ export class CreateMovieDTO {
   title: string;
 
   @IsNumberString()
+  @IsNumber()
   year: number;
 
   @IsString()
