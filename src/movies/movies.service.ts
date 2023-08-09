@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CastDto, CreateMovieDTO } from './dto/create-movie.dto';
+import { CreateMovieDTO } from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class MoviesService {
   }
 
   findAll(query) {
-    const { limit, ...rest } = query;
+    const { limit, skip, ...rest } = query;
     return this.movieModel
       .find(
         { ...rest },
@@ -25,6 +25,7 @@ export class MoviesService {
           cast: 0,
         },
       )
+      .skip(parseInt(skip))
       .limit(parseInt(limit));
   }
 
