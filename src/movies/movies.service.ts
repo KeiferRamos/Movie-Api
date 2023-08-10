@@ -13,24 +13,32 @@ export class MoviesService {
   }
 
   findAll(query, body) {
-    const { limit, skip, ...rest } = query;
-
+    const { limit, skip, sort, ord = 'asc', ...rest } = query;
     let includedKeys = {};
 
-    Object.keys(body).forEach((key) => {
-      if (typeof body[key] === 'object') {
-        Object.keys(body[key]).forEach((itemKey) => {
-          includedKeys[`${key}.${itemKey}`] = 1;
-        });
-      } else {
-        includedKeys[key] = 1;
-      }
-    });
+    if (body) {
+      Object.keys(body).forEach((key) => {
+        if (typeof body[key] === 'object') {
+          Object.keys(body[key]).forEach((itemKey) => {
+            if (typeof body[key][itemKey] === 'object') {
+              Object.keys(body[key][itemKey]).forEach((childKey) => {
+                includedKeys[`${key}.${itemKey}.${childKey}`] = 1;
+              });
+            } else {
+              includedKeys[`${key}.${itemKey}`] = 1;
+            }
+          });
+        } else {
+          includedKeys[key] = 1;
+        }
+      });
+    }
 
     return this.movieModel
       .find({ ...rest }, includedKeys)
       .skip(parseInt(skip))
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .sort([[sort, ord]]);
   }
 
   findSimilar(id: string) {
