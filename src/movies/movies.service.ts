@@ -12,16 +12,16 @@ export class MoviesService {
     return this.movieModel.create({ ...body });
   }
 
-  findAll(query, body) {
-    const { limit, skip, sort, ord = 'asc', ...rest } = query;
+  findAll(query) {
+    const { limit, skip, includes, sort, ord = 'asc', ...rest } = query;
     let includedKeys = {};
 
-    if (body) {
-      Object.keys(body).forEach((key) => {
-        if (typeof body[key] === 'object') {
-          Object.keys(body[key]).forEach((itemKey) => {
-            if (typeof body[key][itemKey] === 'object') {
-              Object.keys(body[key][itemKey]).forEach((childKey) => {
+    if (includes) {
+      Object.keys(includes).forEach((key) => {
+        if (typeof includes[key] === 'object') {
+          Object.keys(includes[key]).forEach((itemKey) => {
+            if (typeof includes[key][itemKey] === 'object') {
+              Object.keys(includes[key][itemKey]).forEach((childKey) => {
                 includedKeys[`${key}.${itemKey}.${childKey}`] = 1;
               });
             } else {
