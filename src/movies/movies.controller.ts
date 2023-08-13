@@ -17,7 +17,7 @@ import { MoviesService } from './movies.service';
 @Controller('movies')
 export class MoviesController {
   constructor(private movieService: MoviesService) {}
-  @Get()
+  @Post()
   getAllMovies(@Query() query, @Body() body): Promise<Movie[]> {
     return this.movieService.findAll(query, body);
   }

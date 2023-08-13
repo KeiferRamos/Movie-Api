@@ -33,12 +33,15 @@ export class MoviesService {
         }
       });
     }
-
-    return this.movieModel
+    const response = this.movieModel
       .find({ ...rest }, includedKeys)
-      .skip(parseInt(skip))
       .limit(parseInt(limit))
-      .sort([[sort, ord]]);
+      .skip(parseInt(skip));
+
+    if (sort) {
+      return response.sort([[sort, ord]]);
+    }
+    return response;
   }
 
   findSimilar(id: string) {
