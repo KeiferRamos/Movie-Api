@@ -5,4 +5,5 @@ export const Genre = new mongoose.Schema({
   mobileImage: String,
   image: String,
   description: String,
+  icon: String,
 });

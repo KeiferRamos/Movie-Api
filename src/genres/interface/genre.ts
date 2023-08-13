@@ -3,4 +3,5 @@ export interface Genre {
   mobileImage: string;
   image: string;
   description: string;
+  icon: String;
 }
