@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { ActivitiesModule } from './activities/activities.module';
 
 import { GenresModule } from './genres/genres.module';
+import { CinephileModule } from './cinephile/cinephile.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GenresModule } from './genres/genres.module';
     MoviesModule,
     UsersModule,
     ActivitiesModule,
+    CinephileModule,
   ],
 })
 export class AppModule {}

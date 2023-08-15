@@ -65,11 +65,14 @@ export class UsersService {
       user: {
         image: validEmail.image,
       },
-      access_token: this.jwtService.sign({
-        id: validEmail._id,
-        role: validEmail.role,
-        username: validEmail.username,
-      }),
+      access_token: this.jwtService.sign(
+        {
+          id: validEmail._id,
+          role: validEmail.role,
+          username: validEmail.username,
+        },
+        { expiresIn: '24h' },
+      ),
     };
   }
 }

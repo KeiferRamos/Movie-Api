@@ -22,9 +22,8 @@ export const Movie = new mongoose.Schema({
         {
           username: String,
           userImage: String,
-          title: String,
+          userId: String,
           review: String,
-          stars: Number,
         },
         { timestamps: true },
       ),

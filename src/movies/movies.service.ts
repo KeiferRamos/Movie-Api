@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateMovieDTO } from './dto/create-movie.dto';
+import {
+  CastDto,
+  CreateMovieDTO,
+  EditReviewDto,
+  ReviewDto,
+} from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
+import getincludes from '../helper/getincludes';
 
 @Injectable()
 export class MoviesService {
@@ -14,25 +20,8 @@ export class MoviesService {
 
   findAll(query) {
     const { limit, skip, includes, sort, ord = 'asc', ...rest } = query;
-    let includedKeys = {};
+    const includedKeys = getincludes(includes);
 
-    if (includes) {
-      Object.keys(includes).forEach((key) => {
-        if (typeof includes[key] === 'object') {
-          Object.keys(includes[key]).forEach((itemKey) => {
-            if (typeof includes[key][itemKey] === 'object') {
-              Object.keys(includes[key][itemKey]).forEach((childKey) => {
-                includedKeys[`${key}.${itemKey}.${childKey}`] = 1;
-              });
-            } else {
-              includedKeys[`${key}.${itemKey}`] = 1;
-            }
-          });
-        } else {
-          includedKeys[key] = 1;
-        }
-      });
-    }
     const response = this.movieModel
       .find({ ...rest }, includedKeys)
       .limit(parseInt(limit))
@@ -51,8 +40,9 @@ export class MoviesService {
     );
   }
 
-  findById(id: string) {
-    return this.movieModel.findById(id);
+  findById(id: string, { includes }) {
+    const includedKeys = getincludes(includes);
+    return this.movieModel.findById(id, includedKeys);
   }
 
   update(_id: string, body: CreateMovieDTO) {
@@ -61,7 +51,7 @@ export class MoviesService {
     });
   }
 
-  add(id: string, body) {
+  add(id: string, body: CastDto) {
     return this.movieModel.updateOne(
       { _id: id },
       {
@@ -74,7 +64,7 @@ export class MoviesService {
     );
   }
 
-  addReview(id: string, body) {
+  addReview(id: string, body: ReviewDto) {
     return this.movieModel.updateOne(
       { _id: id },
       {
@@ -102,43 +92,35 @@ export class MoviesService {
     );
   }
 
-  editReview(id: string, { title, review, username, userImage }) {
+  editReview(id: string, { review }: EditReviewDto) {
     return this.movieModel.updateOne(
       {
         'reviews._id': id,
       },
       {
         $set: {
-          'reviews.$.title': title,
           'reviews.$.review': review,
-          'reviews.$.username': username,
-          'reviews.$.userImage': userImage,
         },
       },
     );
   }
 
-  like(id, username) {
-    return this.movieModel.updateOne(
-      {
-        _id: id,
-      },
-      {
-        $push: {
-          likes: username,
-        },
-      },
-    );
-  }
+  async like(id: string, userId: string) {
+    const { likes } = await this.findById(id, { includes: { likes: 1 } });
 
-  dislike(id, username) {
     return this.movieModel.updateOne(
       {
         _id: id,
       },
-      {
-        $pull: { likes: { $eq: username } },
-      },
+      likes.includes(userId)
+        ? {
+            $pull: { likes: { $eq: userId } },
+          }
+        : {
+            $push: {
+              likes: userId,
+            },
+          },
     );
   }
 

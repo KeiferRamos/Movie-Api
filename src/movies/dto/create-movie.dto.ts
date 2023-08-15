@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -7,6 +8,22 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+
+export class ReviewDto {
+  @IsString()
+  username: string;
+
+  @IsString()
+  userImage: string;
+
+  @IsString()
+  review: string;
+
+  @IsString()
+  userId: string;
+}
+
+export class EditReviewDto extends PartialType(ReviewDto) {}
 
 export class CastDto {
   @IsString()
@@ -54,6 +71,10 @@ export class CreateMovieDTO {
   @IsOptional()
   @Type(() => CastDto)
   cast: CastDto[];
+
+  @IsArray()
+  @Type(() => ReviewDto)
+  reviews: ReviewDto[];
 
   @IsOptional()
   rank: RankDto;

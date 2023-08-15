@@ -12,7 +12,7 @@ export interface Movie {
     username: string;
     userImage: string;
     review: string;
-    title: string;
+    userId: string;
   }[];
   featured: boolean;
   trailer: string;

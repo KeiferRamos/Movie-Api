@@ -10,7 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { CreateMovieDTO } from './dto/create-movie.dto';
+import {
+  CreateMovieDTO,
+  EditReviewDto,
+  ReviewDto,
+} from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 import { MoviesService } from './movies.service';
 
@@ -29,8 +33,8 @@ export class MoviesController {
   }
 
   @Get(':id')
-  getMovieById(@Param('id') id: string): Promise<Movie> {
-    return this.movieService.findById(id);
+  getMovieById(@Param('id') id: string, @Query() query): Promise<Movie> {
+    return this.movieService.findById(id, query);
   }
 
   @Get('/similar/:id')
@@ -59,28 +63,27 @@ export class MoviesController {
     return this.movieService.add(id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/reviews/create/:id')
-  addReview(@Param('id') id: string, @Body() body) {
+  addReview(@Param('id') id: string, @Body() body: ReviewDto) {
     return this.movieService.addReview(id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/reviews/delete/:id')
   deleteReview(@Param('id') id: string, @Body() body) {
     return this.movieService.deleteReview(id, body.reviewid);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/reviews/edit/:id')
-  editReview(@Param('id') id: string, @Body() body) {
+  editReview(@Param('id') id: string, @Body() body: EditReviewDto) {
     return this.movieService.editReview(id, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('/likes/:id')
-  addLike(@Param('id') id, @Body() body) {
-    return this.movieService.like(id, body.username);
-  }
-
-  @Put('/dislikes/:id')
-  removeLike(@Param('id') id, @Body() body) {
-    return this.movieService.dislike(id, body.username);
+  LikeAndDislike(@Param('id') id: string, @Body() body: { userId: string }) {
+    return this.movieService.like(id, body.userId);
   }
 }

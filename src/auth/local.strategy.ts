@@ -7,6 +7,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       secretOrKey: process.env.SECRET,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
+      expiresIn: '30s',
     });
   }
 
