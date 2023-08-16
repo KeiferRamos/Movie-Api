@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Put,
@@ -12,6 +13,7 @@ import { CinephileService } from './cinephile.service';
 import {
   BookmarkDTO,
   CinephileDTO,
+  CreateBookMarkDto,
   PartialCinephileDto,
 } from './dto/cinephile.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
@@ -38,18 +40,23 @@ export class CinephileController {
 
   @UseGuards(JwtAuthGuard)
   @Post('bookmark/:id')
-  bookMarkItem(@Param('id') id: string, @Body() body: BookmarkDTO) {
-    return this.cinephileService.addBookmark(id, body);
+  bookMarkItem(@Headers() item, @Param('id') id) {
+    return this.cinephileService.addBookmark(item, id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('bookmark/:id')
-  removeMarkItem(@Param('id') id: string) {
-    return this.cinephileService.removeBookmark(id);
+  @Post('unbookmark/:id')
+  unbookMarkItem(@Headers() item, @Param('id') id) {
+    return this.cinephileService.removeBookmark(item, id);
   }
 
   @Get()
   getAll(@Query() query) {
     return this.cinephileService.findAll(query);
+  }
+
+  @Get(':id')
+  getById(@Param('id') id, @Query() query) {
+    return this.cinephileService.findById(id, query);
   }
 }

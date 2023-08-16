@@ -1,18 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  CastDto,
-  CreateMovieDTO,
-  EditReviewDto,
-  ReviewDto,
-} from './dto/create-movie.dto';
+import { CastDto, CreateMovieDTO, ReviewDto } from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 import getincludes from '../helper/getincludes';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MoviesService {
-  constructor(@InjectModel('movie') private movieModel: Model<Movie>) {}
+  constructor(
+    @InjectModel('movie') private movieModel: Model<Movie>,
+    private jwtService: JwtService,
+  ) {}
 
   async create(body: CreateMovieDTO) {
     return this.movieModel.create({ ...body });
@@ -20,6 +19,7 @@ export class MoviesService {
 
   findAll(query) {
     const { limit, skip, includes, sort, ord = 'asc', ...rest } = query;
+
     const includedKeys = getincludes(includes);
 
     const response = this.movieModel
@@ -64,20 +64,25 @@ export class MoviesService {
     );
   }
 
-  addReview(id: string, body: ReviewDto) {
-    return this.movieModel.updateOne(
+  async addReview(id: string, { review }: ReviewDto, item) {
+    const { _id: userId, userImage, username } = this.extractToken(item);
+    const data = await this.movieModel.findOneAndUpdate(
       { _id: id },
       {
         $push: {
           reviews: {
-            ...body,
+            review,
+            userId,
+            userImage,
+            username,
           },
         },
       },
     );
+    return { reviews: data.reviews };
   }
 
-  deleteReview(id: string, reviewid: string) {
+  deleteReview(id: string, reviewid: string, item) {
     return this.movieModel.updateOne(
       {
         _id: id,
@@ -86,16 +91,23 @@ export class MoviesService {
         $pull: {
           reviews: {
             _id: reviewid,
+            userId: this.extractToken(item)._id,
           },
         },
       },
     );
   }
 
-  editReview(id: string, { review }: EditReviewDto) {
+  extractToken(item): any {
+    const [type, token] = item.authorization?.split(' ') ?? [];
+    return this.jwtService.decode(token);
+  }
+
+  editReview(id: string, { review }: ReviewDto, item) {
     return this.movieModel.updateOne(
       {
         'reviews._id': id,
+        'reviews.userId': this.extractToken(item)._id,
       },
       {
         $set: {
@@ -105,10 +117,11 @@ export class MoviesService {
     );
   }
 
-  async like(id: string, userId: string) {
+  async like(id: string, item) {
+    const { _id: userId } = this.extractToken(item);
     const { likes } = await this.findById(id, { includes: { likes: 1 } });
 
-    return this.movieModel.updateOne(
+    const { likes: response } = await this.movieModel.findOneAndUpdate(
       {
         _id: id,
       },
@@ -122,6 +135,8 @@ export class MoviesService {
             },
           },
     );
+
+    return { likes: response };
   }
 
   delete(id: string) {

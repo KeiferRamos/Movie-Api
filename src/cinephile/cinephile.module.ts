@@ -4,6 +4,7 @@ import { CinephileService } from './cinephile.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CinephileSchema } from './schema/cinephile.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { MoviesModule } from 'src/movies/movies.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       secret: process.env.SECRET,
     }),
+    MoviesModule,
   ],
   controllers: [CinephileController],
   providers: [CinephileService],

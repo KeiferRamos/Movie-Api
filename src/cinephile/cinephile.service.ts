@@ -7,14 +7,17 @@ import { JwtService } from '@nestjs/jwt';
 import {
   BookmarkDTO,
   CinephileDTO,
+  CreateBookMarkDto,
   PartialCinephileDto,
 } from './dto/cinephile.dto';
 import getincludes from 'src/helper/getincludes';
+import { MoviesService } from 'src/movies/movies.service';
 
 @Injectable()
 export class CinephileService {
   constructor(
     @InjectModel('cinephile') private readonly CinephileModel: Model<Cinephile>,
+    private readonly movieService: MoviesService,
     private readonly jwtservice: JwtService,
   ) {}
 
@@ -49,14 +52,13 @@ export class CinephileService {
     if (!passwordVerify) {
       throw new BadRequestException('incorrect email or password');
     }
-
+    const { username, userImage, _id } = isValidEmail;
     return {
       access_token: this.jwtservice.sign(
-        {
-          id: isValidEmail._id,
-        },
+        { username, userImage, _id },
         { expiresIn: '24h' },
       ),
+      user: { username, userImage, _id },
     };
   }
 
@@ -65,27 +67,49 @@ export class CinephileService {
     return this.CinephileModel.find({}, includedKeys);
   }
 
-  addBookmark(id: string, body: BookmarkDTO) {
-    return this.CinephileModel.findOneAndUpdate(
-      { _id: id },
-      {
-        $push: {
-          bookmark: body,
-        },
-      },
-      { new: true },
-    );
+  findById(id: string, query) {
+    const includes = getincludes(query.includes);
+    return this.CinephileModel.findById(id, includes);
   }
 
-  removeBookmark(id: string) {
-    return this.CinephileModel.findOneAndUpdate(
-      {},
+  async addBookmark(item, movieId) {
+    const { _id } = this.movieService.extractToken(item);
+
+    try {
+      const movie = await this.movieService.findById(movieId, {
+        includes: { title: 1, genres: 1, image: 1, year: 1 },
+      });
+
+      return this.CinephileModel.findOneAndUpdate(
+        { _id },
+        {
+          $push: {
+            bookmark: {
+              movieId,
+              title: movie.title,
+              year: movie.year,
+              genres: movie.genres,
+              image: movie.image,
+            },
+          },
+        },
+        { new: true },
+      );
+    } catch {
+      return new BadRequestException(`no movie with id ${movieId}`);
+    }
+  }
+
+  removeBookmark(item, movieId) {
+    const { _id } = this.movieService.extractToken(item);
+
+    return this.CinephileModel.updateOne(
+      { _id },
       {
         $pull: {
-          bookmark: { _id: id },
+          bookmark: { movieId },
         },
       },
-      { new: true },
     );
   }
 

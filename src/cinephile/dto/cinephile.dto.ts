@@ -1,11 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType, PickType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
   IsEmail,
   IsNumber,
-  IsObject,
   IsOptional,
   IsString,
   ValidateNested,
@@ -13,15 +12,19 @@ import {
 import { Match } from 'src/users/decorator/decorator';
 
 export class BookmarkDTO {
+  @IsOptional()
   @IsString()
   title: string;
 
+  @IsOptional()
   @IsNumber()
   year: number;
 
+  @IsOptional()
   @IsString()
   image: string;
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   genres: string;
@@ -29,6 +32,8 @@ export class BookmarkDTO {
   @IsString()
   movieId: string;
 }
+
+export class CreateBookMarkDto extends PickType(BookmarkDTO, ['movieId']) {}
 
 export class CinephileDTO {
   @IsString()

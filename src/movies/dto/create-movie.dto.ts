@@ -1,29 +1,11 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType, PickType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsBoolean,
-  IsNumber,
-  IsNumberString,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class ReviewDto {
   @IsString()
-  username: string;
-
-  @IsString()
-  userImage: string;
-
-  @IsString()
   review: string;
-
-  @IsString()
-  userId: string;
 }
-
-export class EditReviewDto extends PartialType(ReviewDto) {}
 
 export class CastDto {
   @IsString()
