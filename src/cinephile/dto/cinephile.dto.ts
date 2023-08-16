@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -50,6 +51,7 @@ export class CinephileDTO {
   @IsString()
   userImage: string;
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BookmarkDTO)

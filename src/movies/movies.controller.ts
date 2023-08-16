@@ -83,7 +83,13 @@ export class MoviesController {
 
   @UseGuards(JwtAuthGuard)
   @Put('/likes/:id')
-  LikeAndDislike(@Param('id') id: string, @Body() body: { userId: string }) {
+  Like(@Param('id') id: string, @Body() body: { userId: string }) {
     return this.movieService.like(id, body.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/dislikes/:id')
+  Dislike(@Param('id') id: string, @Body() body: { userId: string }) {
+    return this.movieService.dislike(id, body.userId);
   }
 }
