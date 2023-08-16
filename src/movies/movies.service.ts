@@ -105,27 +105,22 @@ export class MoviesService {
     );
   }
 
-  async dislike(id: string, userId: string) {
-    return this.movieModel.updateOne(
-      {
-        _id: id,
-      },
-      {
-        $pull: { likes: { $eq: userId } },
-      },
-    );
-  }
-
   async like(id: string, userId: string) {
+    const { likes } = await this.findById(id, { includes: { likes: 1 } });
+
     return this.movieModel.updateOne(
       {
         _id: id,
       },
-      {
-        $push: {
-          likes: userId,
-        },
-      },
+      likes.includes(userId)
+        ? {
+            $pull: { likes: { $eq: userId } },
+          }
+        : {
+            $push: {
+              likes: userId,
+            },
+          },
     );
   }
 
