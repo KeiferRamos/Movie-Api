@@ -1,4 +1,4 @@
-export default function (includes = {}) {
+export function getincludes(includes = {}) {
   let includedKeys = {};
 
   Object.keys(includes).forEach((key) => {

@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { CreateMovieDTO, ReviewDto } from './dto/create-movie.dto';
+import { CreateMovieDTO, ReviewDto, UpdateMovie } from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 import { MoviesService } from './movies.service';
 
@@ -24,9 +24,9 @@ export class MoviesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('create')
-  createMovie(@Body() body: CreateMovieDTO): Promise<Movie> {
-    return this.movieService.create(body);
+  @Post()
+  createMovie(@Body() body: CreateMovieDTO, @Headers() item): Promise<Movie> {
+    return this.movieService.create(body, item);
   }
 
   @Get(':id')
@@ -43,15 +43,16 @@ export class MoviesController {
   @Put(':id')
   updateMovie(
     @Param('id') id: string,
-    @Body() body: CreateMovieDTO,
+    @Body() body: UpdateMovie,
+    @Headers() item,
   ): Promise<Movie> {
-    return this.movieService.update(id, body);
+    return this.movieService.update(id, body, item);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  deleteMovieById(@Param('id') id: string): Promise<Movie> {
-    return this.movieService.delete(id);
+  deleteMovieById(@Param('id') id: string, @Headers() item): Promise<Movie> {
+    return this.movieService.delete(id, item);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -61,19 +62,19 @@ export class MoviesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/reviews/create/:id')
+  @Post('/reviews/:id')
   addReview(@Param('id') id: string, @Body() body: ReviewDto, @Headers() item) {
     return this.movieService.addReview(id, body, item);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/reviews/delete/:id')
-  deleteReview(@Param('id') id: string, @Body() body, @Headers() item) {
-    return this.movieService.deleteReview(id, body.reviewid, item);
+  @Delete('/reviews/:id')
+  deleteReview(@Param('id') id: string, @Headers() item) {
+    return this.movieService.deleteReview(id, item);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/reviews/edit/:id')
+  @Put('/reviews/:id')
   editReview(
     @Param('id') id: string,
     @Body() body: ReviewDto,

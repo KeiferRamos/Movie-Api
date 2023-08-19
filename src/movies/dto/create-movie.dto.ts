@@ -1,6 +1,13 @@
-import { PartialType, PickType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class ReviewDto {
   @IsString()
@@ -18,17 +25,41 @@ export class CastDto {
   image: string;
 }
 
-class RankDto {
-  @IsBoolean()
-  isRanked: boolean;
+class SimilarDto {
+  @IsString()
+  title: string;
 
-  rankNumber: number;
+  @IsString()
+  image: string;
+
+  @IsString()
+  mobileImage: string;
+
+  @IsNumber()
+  year: number;
+
+  @IsBoolean()
+  featured: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  likes: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  genres: string[];
+
+  @IsString()
+  movieId: string;
 }
 
 export class CreateMovieDTO {
   @IsString()
   title: string;
 
+  @IsNumber()
   year: number;
 
   @IsString()
@@ -38,35 +69,36 @@ export class CreateMovieDTO {
   trailer: string;
 
   @IsString()
-  @IsOptional()
   image: string;
 
   @IsString()
-  @IsOptional()
   mobileImage: string;
 
   @IsBoolean()
-  @IsOptional()
   featured: boolean;
 
   @IsArray()
-  @IsOptional()
   @Type(() => CastDto)
+  @ValidateNested({ each: true })
   cast: CastDto[];
 
   @IsArray()
+  @IsOptional()
   @Type(() => ReviewDto)
+  @ValidateNested({ each: true })
   reviews: ReviewDto[];
 
-  @IsOptional()
-  rank: RankDto;
+  @IsNumber()
+  rank: number;
 
   @IsArray()
-  @IsOptional()
   @IsString({ each: true })
   genres: string[];
 
   @IsArray()
-  @IsOptional()
-  similar: [];
+  @Type(() => SimilarDto)
+  @ValidateNested({ each: true })
+  similar: SimilarDto[];
 }
+
+export class UpdateMovie extends PartialType(CreateMovieDTO) {}

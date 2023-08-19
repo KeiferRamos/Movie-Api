@@ -12,4 +12,7 @@ export class GenreDto {
 
   @IsString()
   description: string;
+
+  @IsString()
+  icon: string;
 }

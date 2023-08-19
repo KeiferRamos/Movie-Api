@@ -37,14 +37,8 @@ export const Movie = new mongoose.Schema({
     },
   ],
   rank: {
-    isRanked: {
-      type: Boolean,
-      default: false,
-    },
-    rankNumber: {
-      type: Number,
-      default: 0,
-    },
+    type: Number,
+    default: null,
   },
   genres: [StringSchema],
   plot: StringSchema,
@@ -61,16 +55,6 @@ export const Movie = new mongoose.Schema({
       title: StringSchema,
       movieId: StringSchema,
       genres: [StringSchema],
-      rank: {
-        isRanked: {
-          type: Boolean,
-          default: false,
-        },
-        rankNumber: {
-          type: Number,
-          default: 0,
-        },
-      },
     },
   ],
 });

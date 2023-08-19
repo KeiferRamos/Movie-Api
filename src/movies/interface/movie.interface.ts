@@ -4,10 +4,7 @@ export interface Movie {
   image: string;
   mobileImage: string;
   likes: string[];
-  rank: {
-    isRanked: boolean;
-    rankNumber: number;
-  };
+  rank: number;
   reviews: {
     username: string;
     userImage: string;
@@ -35,15 +32,6 @@ export interface Movie {
     title: string;
     movieId: string;
     genres: string[];
-    rank: {
-      isRanked: {
-        type: boolean;
-        default: false;
-      };
-      rankNumber: {
-        type: number;
-        default: 0;
-      };
-    };
+    rank: number;
   }[];
 }

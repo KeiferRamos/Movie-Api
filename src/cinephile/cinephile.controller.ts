@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
@@ -45,7 +46,7 @@ export class CinephileController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('unbookmark/:id')
+  @Delete('bookmark/:id')
   unbookMarkItem(@Headers() item, @Param('id') id) {
     return this.cinephileService.removeBookmark(item, id);
   }

@@ -4,13 +4,8 @@ import { Cinephile } from './interface/cinephile.interface';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import {
-  BookmarkDTO,
-  CinephileDTO,
-  CreateBookMarkDto,
-  PartialCinephileDto,
-} from './dto/cinephile.dto';
-import getincludes from 'src/helper/getincludes';
+import { CinephileDTO, PartialCinephileDto } from './dto/cinephile.dto';
+import { getincludes } from 'src/helper';
 import { MoviesService } from 'src/movies/movies.service';
 
 @Injectable()
@@ -25,7 +20,7 @@ export class CinephileService {
     const isValidEmail = await this.CinephileModel.findOne({ email });
 
     if (isValidEmail) {
-      return new BadRequestException('email already exist.');
+      throw new BadRequestException('email already exist.');
     }
 
     const salt = await bcrypt.genSalt();
@@ -42,7 +37,7 @@ export class CinephileService {
     const isValidEmail = await this.CinephileModel.findOne({ email });
 
     if (!isValidEmail) {
-      return new BadRequestException('incorrect email or password');
+      throw new BadRequestException('incorrect email or password');
     }
 
     const passwordVerify = await bcrypt.compare(
@@ -80,7 +75,7 @@ export class CinephileService {
         includes: { title: 1, genres: 1, image: 1, year: 1 },
       });
 
-      return this.CinephileModel.findOneAndUpdate(
+      const data = await this.CinephileModel.findOneAndUpdate(
         { _id },
         {
           $push: {
@@ -95,22 +90,29 @@ export class CinephileService {
         },
         { new: true },
       );
+      return { bookmark: data.bookmark };
     } catch {
-      return new BadRequestException(`no movie with id ${movieId}`);
+      throw new BadRequestException(`no movie with id ${movieId}`);
     }
   }
 
-  removeBookmark(item, movieId) {
+  async removeBookmark(item, movieId) {
     const { _id } = this.movieService.extractToken(item);
 
-    return this.CinephileModel.updateOne(
-      { _id },
-      {
-        $pull: {
-          bookmark: { movieId },
+    try {
+      const { bookmark } = await this.CinephileModel.findOneAndUpdate(
+        { _id },
+        {
+          $pull: {
+            bookmark: { movieId },
+          },
         },
-      },
-    );
+        { new: true },
+      );
+      return { bookmark };
+    } catch {
+      return { message: "no idea what you're doing" };
+    }
   }
 
   update(id: string, body: PartialCinephileDto) {

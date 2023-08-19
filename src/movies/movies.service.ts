@@ -1,29 +1,54 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CastDto, CreateMovieDTO, ReviewDto } from './dto/create-movie.dto';
+import {
+  CastDto,
+  CreateMovieDTO,
+  ReviewDto,
+  UpdateMovie,
+} from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
-import getincludes from '../helper/getincludes';
+import { getincludes } from '../helper';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectModel('movie') private movieModel: Model<Movie>,
     private jwtService: JwtService,
+    private readonly userService: UsersService,
   ) {}
 
-  async create(body: CreateMovieDTO) {
+  async create(body: CreateMovieDTO, item) {
+    const { id } = this.extractToken(item);
+    const isValidUser = await this.userService.findById(id);
+    if (!isValidUser) {
+      throw new BadRequestException('who are you?');
+    }
     return this.movieModel.create({ ...body });
   }
 
+  extractToken(item): any {
+    const [type, token] = item.authorization?.split(' ') ?? [];
+    return this.jwtService.decode(token);
+  }
+
   findAll(query) {
-    const { limit, skip, includes, sort, ord = 'asc', ...rest } = query;
+    const {
+      limit,
+      skip,
+      rank = 0,
+      includes,
+      sort,
+      ord = 'asc',
+      ...rest
+    } = query;
 
     const includedKeys = getincludes(includes);
 
     const response = this.movieModel
-      .find({ ...rest }, includedKeys)
+      .find({ ...rest, rank: { $gte: rank } }, includedKeys)
       .limit(parseInt(limit))
       .skip(parseInt(skip));
 
@@ -36,7 +61,7 @@ export class MoviesService {
   findSimilar(id: string) {
     return this.movieModel.find(
       { _id: { $ne: id } },
-      { reviews: 0, similar: 0, plot: 0, trailer: 0, cast: 0 },
+      { reviews: 0, similar: 0, plot: 0, trailer: 0, cast: 0, rank: 0 },
     );
   }
 
@@ -45,7 +70,12 @@ export class MoviesService {
     return this.movieModel.findById(id, includedKeys);
   }
 
-  update(_id: string, body: CreateMovieDTO) {
+  async update(_id: string, body: UpdateMovie, item) {
+    const { id } = this.extractToken(item);
+    const isValidUser = await this.userService.findById(id);
+    if (!isValidUser) {
+      throw new BadRequestException('who are you?');
+    }
     return this.movieModel.findOneAndUpdate({ _id }, body, {
       new: true,
     });
@@ -65,81 +95,103 @@ export class MoviesService {
   }
 
   async addReview(id: string, { review }: ReviewDto, item) {
-    const { _id: userId, userImage, username } = this.extractToken(item);
-    const data = await this.movieModel.findOneAndUpdate(
-      { _id: id },
-      {
-        $push: {
-          reviews: {
-            review,
-            userId,
-            userImage,
-            username,
+    try {
+      const { _id: userId, userImage, username } = this.extractToken(item);
+      console.log(userId + 'hello world');
+      const { reviews } = await this.movieModel.findOneAndUpdate(
+        { _id: id },
+        {
+          $push: {
+            reviews: {
+              review,
+              userId,
+              userImage,
+              username,
+            },
           },
         },
-      },
-    );
-    return { reviews: data.reviews };
+        { new: true },
+      );
+      return { reviews };
+    } catch {
+      throw new BadRequestException('what are you doing boy?');
+    }
   }
 
-  deleteReview(id: string, reviewid: string, item) {
-    return this.movieModel.updateOne(
-      {
-        _id: id,
-      },
-      {
-        $pull: {
-          reviews: {
-            _id: reviewid,
-            userId: this.extractToken(item)._id,
+  async deleteReview(id: string, item) {
+    try {
+      const { reviews } = await this.movieModel.findOneAndUpdate(
+        {
+          'reviews._id': id,
+        },
+        {
+          $pull: {
+            reviews: {
+              _id: id,
+              userId: this.extractToken(item)._id,
+            },
           },
         },
-      },
-    );
+        { new: true },
+      );
+      return { reviews };
+    } catch {
+      throw new BadRequestException('what are you doing boy?');
+    }
   }
 
-  extractToken(item): any {
-    const [type, token] = item.authorization?.split(' ') ?? [];
-    return this.jwtService.decode(token);
-  }
-
-  editReview(id: string, { review }: ReviewDto, item) {
-    return this.movieModel.updateOne(
-      {
-        'reviews._id': id,
-        'reviews.userId': this.extractToken(item)._id,
-      },
-      {
-        $set: {
-          'reviews.$.review': review,
+  async editReview(id: string, { review }: ReviewDto, item) {
+    try {
+      const { reviews } = await this.movieModel.findOneAndUpdate(
+        {
+          'reviews._id': id,
+          'reviews.userId': this.extractToken(item)._id,
         },
-      },
-    );
+        {
+          $set: {
+            'reviews.$.review': review,
+          },
+        },
+        { new: true },
+      );
+      return { reviews };
+    } catch {
+      throw new BadRequestException('what are you doing boy?');
+    }
   }
 
   async like(id: string, item) {
-    const { _id: userId } = this.extractToken(item);
-    const { likes } = await this.findById(id, { includes: { likes: 1 } });
+    try {
+      const { _id: userId } = this.extractToken(item);
+      const { likes } = await this.findById(id, { includes: { likes: 1 } });
 
-    const { likes: response } = await this.movieModel.findOneAndUpdate(
-      {
-        _id: id,
-      },
-      likes.includes(userId)
-        ? {
-            $pull: { likes: { $eq: userId } },
-          }
-        : {
-            $push: {
-              likes: userId,
+      const { likes: response } = await this.movieModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        likes.includes(userId)
+          ? {
+              $pull: { likes: { $eq: userId } },
+            }
+          : {
+              $push: {
+                likes: userId,
+              },
             },
-          },
-    );
+      );
 
-    return { likes: response };
+      return { likes: response };
+    } catch {
+      throw new BadRequestException('what are you doing boy?');
+    }
   }
 
-  delete(id: string) {
+  async delete(id: string, item) {
+    const { id: userId } = this.extractToken(item);
+    const isValidUser = await this.userService.findById(userId);
+    if (!isValidUser) {
+      throw new BadRequestException('who are you?');
+    }
     return this.movieModel.findByIdAndRemove(id);
   }
 }

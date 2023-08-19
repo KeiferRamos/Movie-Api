@@ -45,6 +45,7 @@ export class CinephileDTO {
   @IsString()
   password: string;
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @ArrayMinSize(1)
