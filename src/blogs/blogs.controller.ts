@@ -30,8 +30,8 @@ export class BlogsController {
   }
 
   @Get(':id')
-  getBlogById(@Param('id') id: string, @Query() query, @Headers() item) {
-    return this.blogsService.findById(id, query), item;
+  getBlogById(@Param('id') id: string, @Query() query) {
+    return this.blogsService.findById(id, query);
   }
 
   @Delete(':id')
