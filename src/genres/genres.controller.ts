@@ -3,13 +3,16 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { GenresService } from './genres.service';
 import { GenreDto } from './dto/genre';
 import { UpdateGenreDto } from './dto/update-genre';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller('genres')
 export class GenresController {
@@ -26,17 +29,20 @@ export class GenresController {
   }
 
   @Post()
-  createGenre(@Body() body: GenreDto) {
-    return this.genreService.create(body);
+  @UseGuards(JwtAuthGuard)
+  createGenre(@Body() body: GenreDto, @Headers() userAuth) {
+    return this.genreService.create(body, userAuth);
   }
 
   @Put(':id')
-  updateGenre(@Param('id') id: string, @Body() body: UpdateGenreDto) {
-    return this.genreService.update(id, body);
+  @UseGuards(JwtAuthGuard)
+  updateGenre(@Param('id') id: string, @Body() body: UpdateGenreDto, userAuth) {
+    return this.genreService.update(id, body, userAuth);
   }
 
   @Delete(':id')
-  deleteGenre(@Param('id') id: string) {
-    return this.genreService.delete(id);
+  @UseGuards(JwtAuthGuard)
+  deleteGenre(@Param('id') id: string, @Headers() userAuth) {
+    return this.genreService.delete(id, userAuth);
   }
 }
