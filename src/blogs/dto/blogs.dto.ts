@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -24,6 +25,9 @@ export class BlogsDto {
 
   @IsString()
   author: string;
+
+  @IsBoolean()
+  trending: boolean;
 
   @IsArray()
   @ArrayMinSize(1)

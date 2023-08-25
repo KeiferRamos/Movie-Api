@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { GenresService } from './genres.service';
@@ -19,8 +20,8 @@ export class GenresController {
   constructor(private readonly genreService: GenresService) {}
 
   @Get()
-  getAllGenre() {
-    return this.genreService.findAll();
+  getAllGenre(@Query() query) {
+    return this.genreService.findAll(query);
   }
 
   @Get(':id')

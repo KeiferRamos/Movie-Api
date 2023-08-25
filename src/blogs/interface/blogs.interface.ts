@@ -8,4 +8,5 @@ export interface Blogs {
   author: string;
   createdAt: string;
   updatedAt: string;
+  trending: boolean;
 }

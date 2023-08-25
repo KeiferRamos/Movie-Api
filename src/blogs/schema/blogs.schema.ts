@@ -6,6 +6,10 @@ export const Blogs = new mongoose.Schema(
     bannerImage: String,
     contents: [{ htmlElement: String, value: String }],
     author: String,
+    trending: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

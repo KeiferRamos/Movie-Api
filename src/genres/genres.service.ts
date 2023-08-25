@@ -5,6 +5,7 @@ import { Genre } from './interface/genre';
 import { GenreDto } from './dto/genre';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { getincludes } from 'src/helper';
 
 @Injectable()
 export class GenresService {
@@ -19,8 +20,9 @@ export class GenresService {
     return this.jwtService.decode(token);
   }
 
-  findAll() {
-    return this.genreModel.find();
+  findAll({ includes }) {
+    const includedKeys = getincludes(includes);
+    return this.genreModel.find({}, includedKeys);
   }
 
   findById(id: string) {
