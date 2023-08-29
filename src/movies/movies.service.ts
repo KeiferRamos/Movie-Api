@@ -9,29 +9,28 @@ import {
 } from './dto/create-movie.dto';
 import { Movie } from './interface/movie.interface';
 import { getincludes } from '../helper';
-import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectModel('movie') private movieModel: Model<Movie>,
-    private jwtService: JwtService,
     private readonly userService: UsersService,
   ) {}
 
   async create(body: CreateMovieDTO, item) {
-    const { id } = this.extractToken(item);
-    const isValidUser = await this.userService.findById(id);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'create:movie',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
+      return this.movieModel.create({ ...body });
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-    return this.movieModel.create({ ...body });
-  }
-
-  extractToken(item): any {
-    const [type, token] = item.authorization?.split(' ') ?? [];
-    return this.jwtService.decode(token);
   }
 
   findAll(query) {
@@ -71,14 +70,21 @@ export class MoviesService {
   }
 
   async update(_id: string, body: UpdateMovie, item) {
-    const { id } = this.extractToken(item);
-    const isValidUser = await this.userService.findById(id);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'edit:movie',
+      );
+
+      if (!status) {
+        throw new BadRequestException(message);
+      }
+      return this.movieModel.findOneAndUpdate({ _id }, body, {
+        new: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-    return this.movieModel.findOneAndUpdate({ _id }, body, {
-      new: true,
-    });
   }
 
   add(id: string, body: CastDto) {
@@ -96,8 +102,12 @@ export class MoviesService {
 
   async addReview(id: string, { review }: ReviewDto, item) {
     try {
-      const { _id: userId, userImage, username } = this.extractToken(item);
-      console.log(userId + 'hello world');
+      const {
+        _id: userId,
+        userImage,
+        username,
+      } = this.userService.extractToken(item);
+
       const { reviews } = await this.movieModel.findOneAndUpdate(
         { _id: id },
         {
@@ -128,7 +138,7 @@ export class MoviesService {
           $pull: {
             reviews: {
               _id: id,
-              userId: this.extractToken(item)._id,
+              userId: this.userService.extractToken(item)._id,
             },
           },
         },
@@ -145,7 +155,7 @@ export class MoviesService {
       const { reviews } = await this.movieModel.findOneAndUpdate(
         {
           'reviews._id': id,
-          'reviews.userId': this.extractToken(item)._id,
+          'reviews.userId': this.userService.extractToken(item)._id,
         },
         {
           $set: {
@@ -162,7 +172,7 @@ export class MoviesService {
 
   async like(id: string, item) {
     try {
-      const { _id: userId } = this.extractToken(item);
+      const { _id: userId } = this.userService.extractToken(item);
       const { likes } = await this.findById(id, { includes: { likes: 1 } });
 
       const { likes: response } = await this.movieModel.findOneAndUpdate(
@@ -187,11 +197,18 @@ export class MoviesService {
   }
 
   async delete(id: string, item) {
-    const { id: userId } = this.extractToken(item);
-    const isValidUser = await this.userService.findById(userId);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'delete:movie',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
+
+      return this.movieModel.findByIdAndRemove(id);
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-    return this.movieModel.findByIdAndRemove(id);
   }
 }

@@ -1,19 +1,13 @@
-import {
-  IsEmail,
-  IsNumberString,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 import {
   Match,
   RegistrationId,
   ValidateObject,
   ValidateRole,
 } from '../decorator/decorator';
-import { addressValue, imageValue, nameValue } from '../constant';
+import { addressValue, nameValue } from '../constant';
 
-export class userDto {
+export class UserDto {
   @IsString()
   username: string;
 

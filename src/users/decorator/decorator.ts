@@ -27,13 +27,13 @@ export class Validaterole implements ValidatorConstraintInterface {
     value: any,
     validationArguments?: ValidationArguments,
   ): boolean | Promise<boolean> {
-    const [relatedPropertyName] = validationArguments.constraints;
     const role = validationArguments.object['role'];
+
     if (role !== 'administrator') {
       return true;
     }
 
-    if (role === 'administrator' && value === relatedPropertyName) {
+    if (role === 'administrator' && value === process.env.ADMIN_PASS) {
       return true;
     }
     return false;
@@ -96,8 +96,7 @@ export class ValidateRegistrationId implements ValidatorConstraintInterface {
     value: any,
     validationArguments?: ValidationArguments,
   ): boolean | Promise<boolean> {
-    const [relatedPropertyName] = validationArguments.constraints;
-    return value === relatedPropertyName;
+    return value === process.env.REGISTRATION_ID;
   }
   defaultMessage() {
     return 'incorrect registration id';

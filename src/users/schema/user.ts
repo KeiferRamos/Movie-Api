@@ -28,4 +28,5 @@ export const User = new mongoose.Schema({
     lastName: StringSchema,
     middleName: StringSchema,
   },
+  permissions: [String],
 });

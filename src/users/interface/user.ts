@@ -18,4 +18,5 @@ export interface User {
     lastName: string;
     middleName: string;
   };
+  permissions: string[];
 }

@@ -16,6 +16,11 @@ export class CinephileService {
     private readonly jwtservice: JwtService,
   ) {}
 
+  extractToken(item): any {
+    const [type, token] = item.authorization?.split(' ') ?? [];
+    return this.jwtservice.decode(token);
+  }
+
   async create({ email, password, ...rest }: CinephileDTO) {
     const isValidEmail = await this.CinephileModel.findOne({ email });
 
@@ -51,7 +56,7 @@ export class CinephileService {
     return {
       access_token: this.jwtservice.sign(
         { username, userImage, _id },
-        { expiresIn: '24h' },
+        { expiresIn: '8h' },
       ),
       user: { username, userImage, _id },
     };
@@ -68,7 +73,7 @@ export class CinephileService {
   }
 
   async addBookmark(item, movieId) {
-    const { _id } = this.movieService.extractToken(item);
+    const { _id } = this.extractToken(item);
 
     try {
       const movie = await this.movieService.findById(movieId, {
@@ -97,7 +102,7 @@ export class CinephileService {
   }
 
   async removeBookmark(item, movieId) {
-    const { _id } = this.movieService.extractToken(item);
+    const { _id } = this.extractToken(item);
 
     try {
       const { bookmark } = await this.CinephileModel.findOneAndUpdate(

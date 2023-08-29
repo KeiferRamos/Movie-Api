@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Blogs } from './interface/blogs.interface';
-import { MoviesService } from 'src/movies/movies.service';
 import { UsersService } from 'src/users/users.service';
 import { BlogsDto, UpdateBlogs } from './dto/blogs.dto';
 import { getincludes } from 'src/helper';
@@ -11,26 +10,30 @@ import { getincludes } from 'src/helper';
 export class BlogsService {
   constructor(
     @InjectModel('blog') private readonly blogModel: Model<Blogs>,
-    private readonly movieService: MoviesService,
     private readonly userService: UsersService,
   ) {}
 
   async create(item, body: BlogsDto) {
-    const { id } = this.movieService.extractToken(item);
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'create:blog',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(id);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.blogModel.create(body);
+    } catch {
+      throw new BadRequestException('Internal Server Error');
     }
-
-    return this.blogModel.create(body);
   }
 
   find(query) {
-    const { includes, sort = 'title', ord = 'asc' } = query;
+    const { includes, sort = 'title', ord = 'asc', ...rest } = query;
     const includedKeys = getincludes(includes);
 
-    return this.blogModel.find({}, includedKeys).sort([[sort, ord]]);
+    return this.blogModel.find({ ...rest }, includedKeys).sort([[sort, ord]]);
   }
 
   findById(id: string, query) {
@@ -41,23 +44,36 @@ export class BlogsService {
   }
 
   async delete(id: string, item) {
-    const { id: userId } = this.movieService.extractToken(item);
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'delete:blog',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(userId);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.blogModel.findByIdAndDelete(id);
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-    return this.blogModel.findByIdAndDelete(id);
   }
 
   async update(body: UpdateBlogs, id, item) {
-    const { id: userId } = this.movieService.extractToken(item);
+    try {
+      const { message, status } = await this.userService.validation(
+        item,
+        'edit:blog',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(userId);
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.blogModel.findOneAndUpdate({ _id: id }, body, {
+        new: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-
-    return this.blogModel.findOneAndUpdate({ _id: id }, body, { new: true });
   }
 }

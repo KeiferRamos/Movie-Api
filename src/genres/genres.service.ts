@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { Genre } from './interface/genre';
 import { GenreDto } from './dto/genre';
 import { UsersService } from 'src/users/users.service';
-import { JwtService } from '@nestjs/jwt';
 import { getincludes } from 'src/helper';
 
 @Injectable()
@@ -12,13 +11,7 @@ export class GenresService {
   constructor(
     @InjectModel('genre') private genreModel: Model<Genre>,
     private readonly userService: UsersService,
-    private readonly jwtService: JwtService,
   ) {}
-
-  extractToken(item): any {
-    const [type, token] = item.authorization?.split(' ') ?? [];
-    return this.jwtService.decode(token);
-  }
 
   findAll({ includes }) {
     const includedKeys = getincludes(includes);
@@ -30,38 +23,50 @@ export class GenresService {
   }
 
   async update(id: string, body: GenreDto, userAuth) {
-    const { id: userId } = this.extractToken(userAuth);
+    try {
+      const { message, status } = await this.userService.validation(
+        userAuth,
+        'update:genre',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(userId);
-
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.genreModel.findByIdAndUpdate(id, body, { new: true });
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-
-    return this.genreModel.findByIdAndUpdate(id, body, { new: true });
   }
 
   async delete(id: string, userAuth) {
-    const { id: userId } = this.extractToken(userAuth);
+    try {
+      const { message, status } = await this.userService.validation(
+        userAuth,
+        'delete:genre',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(userId);
-
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.genreModel.findByIdAndDelete(id);
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-
-    return this.genreModel.findByIdAndDelete(id);
   }
 
   async create(body: GenreDto, userAuth) {
-    const { id: userId } = this.extractToken(userAuth);
+    try {
+      const { message, status } = await this.userService.validation(
+        userAuth,
+        'delete:genre',
+      );
+      if (!status) {
+        throw new BadRequestException(message);
+      }
 
-    const isValidUser = await this.userService.findById(userId);
-
-    if (!isValidUser) {
-      throw new BadRequestException('who are you?');
+      return this.genreModel.create(body);
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
-
-    return this.genreModel.create(body);
   }
 }
