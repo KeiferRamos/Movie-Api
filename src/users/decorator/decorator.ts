@@ -29,17 +29,17 @@ export class Validaterole implements ValidatorConstraintInterface {
   ): boolean | Promise<boolean> {
     const role = validationArguments.object['role'];
 
-    if (role !== 'administrator') {
+    if (role !== 'admin') {
       return true;
     }
 
-    if (role === 'administrator' && value === process.env.ADMIN_PASS) {
+    if (role === 'admin' && value === process.env.ADMIN_PASS) {
       return true;
     }
     return false;
   }
   defaultMessage() {
-    return 'incorrect administrator level pass';
+    return 'incorrect admin level pass';
   }
 }
 

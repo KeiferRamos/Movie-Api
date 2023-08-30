@@ -21,7 +21,6 @@ export const adminPermission = [
   'create:movie',
   'create:blog',
   'create:genre',
-  'delete:user',
   'edit:movie',
   'edit:blog',
   'edit:genre',
@@ -29,10 +28,13 @@ export const adminPermission = [
   'delete:blog',
   'delete:genre',
   'delete:user',
+  'view:users',
+  'view:movie',
 ];
 
 export const developerPermission = [
   'create:movie',
   'create:blog',
   'create:genre',
+  'view:movie',
 ];

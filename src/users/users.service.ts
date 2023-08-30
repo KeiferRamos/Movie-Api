@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './interface/user';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { UserDto } from './dto/user.dto';
+import { RecordDto, UserDto } from './dto/user.dto';
 import { loginDto } from './dto/login.dto';
 import { adminPermission, developerPermission } from './constant';
 import { UpdateUserDto } from './dto/update.dto';
@@ -21,12 +21,29 @@ export class UsersService {
     return this.jwtService.decode(token);
   }
 
-  findAll() {
-    return this.userModel.find();
+  async findAll(auth) {
+    try {
+      const { message, status } = this.validation(auth, 'view:users');
+      if (!status) {
+        throw new BadRequestException(message);
+      }
+      return this.userModel.find();
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
   }
 
-  findById(id: string) {
-    return this.userModel.findById(id);
+  async findById(id, auth) {
+    try {
+      const { message, status } = this.validation(auth, 'view:users');
+      if (!status) {
+        throw new BadRequestException(message);
+      }
+
+      return this.userModel.findById(id);
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
   }
 
   async update(body: UpdateUserDto, auth) {
@@ -39,39 +56,51 @@ export class UsersService {
       if (user) {
         return { message: 'updated successfully', status: true };
       }
-      return { message: 'unauthorized', status: false };
-    } catch (error) {
-      throw new BadRequestException(error);
-    }
-  }
-
-  async delete(id: string, auth) {
-    try {
-      const { id: userId } = this.extractToken(auth);
-
-      if (userId !== id) {
-        const isValidUser = await this.findById(userId);
-
-        if (!isValidUser || !isValidUser.permissions.includes('delete:user')) {
-          throw new BadRequestException('unauthorized');
-        }
-      }
-      return this.userModel.findByIdAndDelete(id);
+      throw new BadRequestException('Unauthorized');
     } catch (error) {
       throw new BadRequestException(error.response);
     }
   }
 
-  async validation(item, permission: string) {
-    const { id: userId } = this.extractToken(item);
+  async delete(id: string, auth) {
+    try {
+      const { id: userId, permissions } = this.extractToken(auth);
 
-    const isValidUser = await this.findById(userId);
-
-    if (!isValidUser || !isValidUser.permissions.includes(permission)) {
-      return { message: 'unauthorized', status: false };
+      if (userId !== id) {
+        if (permissions && permissions.includes('delete:user')) {
+          throw new BadRequestException('Unauthorized');
+        }
+      }
+      await this.userModel.findByIdAndDelete(id);
+      return { message: 'account successfully deleted' };
+    } catch (error) {
+      throw new BadRequestException(error.response);
     }
+  }
 
-    return { message: 'success', status: true };
+  record(body: RecordDto, auth) {
+    try {
+      const { id } = this.extractToken(auth);
+      return this.userModel.findOneAndUpdate(
+        { _id: id },
+        {
+          $push: {
+            activities: body,
+          },
+        },
+      );
+    } catch (error) {
+      throw new BadRequestException(error.response);
+    }
+  }
+
+  validation(item, permission: string) {
+    const { permissions } = this.extractToken(item);
+
+    if (permissions && permissions.includes(permission)) {
+      return { message: 'success', status: true };
+    }
+    return { message: 'Unauthorized', status: false };
   }
 
   async register(body: UserDto) {
@@ -80,9 +109,9 @@ export class UsersService {
     if (invalidEmail) {
       throw new BadRequestException('email already in used');
     }
-    if (body.role === 'administrator') {
+    if (body.role === 'admin') {
       permissions = adminPermission;
-    } else if (body.role === 'developer') {
+    } else if (body.role === 'dev') {
       permissions = developerPermission;
     }
 
@@ -110,14 +139,12 @@ export class UsersService {
     }
 
     return {
-      user: {
-        image: validEmail.image,
-      },
       access_token: this.jwtService.sign(
         {
           id: validEmail._id,
           role: validEmail.role,
           username: validEmail.username,
+          permissions: validEmail.permissions,
         },
         { expiresIn: '8h' },
       ),

@@ -4,19 +4,13 @@ export interface User {
   contactNumber: string;
   email: string;
   role: string;
-  image: string;
-  bio: string;
-  address: {
-    blockNumber: string;
-    Street: string;
-    Barangay: string;
-    City: string;
-    Province: string;
-  };
-  fullName: {
-    firstName: string;
-    lastName: string;
-    middleName: string;
-  };
   permissions: string[];
+  activities: {
+    method: string;
+    model: string;
+    id: string;
+    summary: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }

@@ -20,13 +20,23 @@ export class MoviesService {
 
   async create(body: CreateMovieDTO, item) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         item,
         'create:movie',
       );
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          summary: `create movie`,
+          method: 'CREATE',
+          model: 'movie',
+        },
+        item,
+      );
+
       return this.movieModel.create({ ...body });
     } catch (error) {
       throw new BadRequestException(error.response);
@@ -71,7 +81,7 @@ export class MoviesService {
 
   async update(_id: string, body: UpdateMovie, item) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         item,
         'edit:movie',
       );
@@ -79,6 +89,17 @@ export class MoviesService {
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          id: _id,
+          summary: `update movie with id ${_id}`,
+          method: 'UPDATE',
+          model: 'movie',
+        },
+        item,
+      );
+
       return this.movieModel.findOneAndUpdate({ _id }, body, {
         new: true,
       });
@@ -198,13 +219,24 @@ export class MoviesService {
 
   async delete(id: string, item) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         item,
         'delete:movie',
       );
+
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          id,
+          summary: `deleted movie with id ${id}`,
+          method: 'DELETE',
+          model: 'movie',
+        },
+        item,
+      );
 
       return this.movieModel.findByIdAndRemove(id);
     } catch (error) {

@@ -24,13 +24,23 @@ export class GenresService {
 
   async update(id: string, body: GenreDto, userAuth) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         userAuth,
         'update:genre',
       );
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          id,
+          summary: `update genre with id ${id}`,
+          method: 'UPDATE',
+          model: 'genre',
+        },
+        userAuth,
+      );
 
       return this.genreModel.findByIdAndUpdate(id, body, { new: true });
     } catch (error) {
@@ -40,13 +50,23 @@ export class GenresService {
 
   async delete(id: string, userAuth) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         userAuth,
         'delete:genre',
       );
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          id,
+          summary: `delete genre with id ${id}`,
+          method: 'DELETE',
+          model: 'genre',
+        },
+        userAuth,
+      );
 
       return this.genreModel.findByIdAndDelete(id);
     } catch (error) {
@@ -56,13 +76,22 @@ export class GenresService {
 
   async create(body: GenreDto, userAuth) {
     try {
-      const { message, status } = await this.userService.validation(
+      const { message, status } = this.userService.validation(
         userAuth,
         'delete:genre',
       );
       if (!status) {
         throw new BadRequestException(message);
       }
+
+      await this.userService.record(
+        {
+          summary: `create genre`,
+          method: 'CREATE',
+          model: 'genre',
+        },
+        userAuth,
+      );
 
       return this.genreModel.create(body);
     } catch (error) {

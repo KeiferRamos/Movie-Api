@@ -4,8 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
-import { ActivitiesModule } from './activities/activities.module';
-
 import { GenresModule } from './genres/genres.module';
 import { CinephileModule } from './cinephile/cinephile.module';
 import { BlogsModule } from './blogs/blogs.module';
@@ -20,7 +18,6 @@ import { BlogsModule } from './blogs/blogs.module';
     AuthModule,
     MoviesModule,
     UsersModule,
-    ActivitiesModule,
     CinephileModule,
     BlogsModule,
   ],

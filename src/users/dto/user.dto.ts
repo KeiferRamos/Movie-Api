@@ -1,11 +1,5 @@
 import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
-import {
-  Match,
-  RegistrationId,
-  ValidateObject,
-  ValidateRole,
-} from '../decorator/decorator';
-import { addressValue, nameValue } from '../constant';
+import { Match, RegistrationId, ValidateRole } from '../decorator/decorator';
 
 export class UserDto {
   @IsString()
@@ -26,10 +20,6 @@ export class UserDto {
   @IsOptional()
   contactNumber: string;
 
-  @IsString()
-  @IsOptional()
-  image: string;
-
   @IsEmail()
   email: string;
 
@@ -37,17 +27,20 @@ export class UserDto {
   admin: string;
 
   @IsString()
-  @IsOptional()
-  bio: string;
+  role: string;
+}
+
+export class RecordDto {
+  @IsString()
+  method: string;
 
   @IsString()
-  role: string;
+  model: string;
 
-  @ValidateObject(nameValue)
+  @IsString()
   @IsOptional()
-  fullName: Object;
+  id?: string;
 
-  @ValidateObject(addressValue)
-  @IsOptional()
-  address: Object;
+  @IsString()
+  summary: string;
 }

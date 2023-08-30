@@ -11,12 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CinephileService } from './cinephile.service';
-import {
-  BookmarkDTO,
-  CinephileDTO,
-  CreateBookMarkDto,
-  PartialCinephileDto,
-} from './dto/cinephile.dto';
+import { CinephileDTO, PartialCinephileDto } from './dto/cinephile.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller('cinephile')
