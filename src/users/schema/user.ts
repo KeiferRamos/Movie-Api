@@ -6,9 +6,11 @@ const StringSchema = {
 };
 
 export const User = new mongoose.Schema({
-  username: StringSchema,
+  firstName: StringSchema,
+  lastName: StringSchema,
   password: StringSchema,
   contactNumber: StringSchema,
+  image: StringSchema,
   email: StringSchema,
   role: {
     type: String,

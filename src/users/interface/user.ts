@@ -1,9 +1,11 @@
 export interface User {
-  username: string;
+  firstName: string;
+  lastName: string;
   password: string;
   contactNumber: string;
   email: string;
   role: string;
+  image: string;
   permissions: string[];
   activities: {
     method: string;

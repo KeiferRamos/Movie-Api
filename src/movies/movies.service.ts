@@ -20,7 +20,7 @@ export class MoviesService {
 
   async create(body: CreateMovieDTO, item) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'create:movie',
       );
@@ -81,7 +81,7 @@ export class MoviesService {
 
   async update(_id: string, body: UpdateMovie, item) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'edit:movie',
       );
@@ -219,7 +219,7 @@ export class MoviesService {
 
   async delete(id: string, item) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'delete:movie',
       );

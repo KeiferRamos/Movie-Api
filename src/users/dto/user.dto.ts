@@ -3,7 +3,14 @@ import { Match, RegistrationId, ValidateRole } from '../decorator/decorator';
 
 export class UserDto {
   @IsString()
-  username: string;
+  firstName: string;
+
+  @IsString()
+  lastName: string;
+
+  @IsOptional()
+  @IsString()
+  image: string;
 
   @RegistrationId(process.env.REGISTRATION_ID)
   registrationId: string;

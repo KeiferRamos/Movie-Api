@@ -15,7 +15,7 @@ export class BlogsService {
 
   async create(item, body: BlogsDto) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'create:blog',
       );
@@ -54,7 +54,7 @@ export class BlogsService {
 
   async delete(id: string, item) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'delete:blog',
       );
@@ -79,7 +79,7 @@ export class BlogsService {
 
   async update(body: UpdateBlogs, id, item) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         item,
         'edit:blog',
       );

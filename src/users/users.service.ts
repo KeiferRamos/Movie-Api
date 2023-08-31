@@ -23,7 +23,7 @@ export class UsersService {
 
   async findAll(auth) {
     try {
-      const { message, status } = this.validation(auth, 'view:users');
+      const { message, status } = await this.validation(auth, 'view:users');
       if (!status) {
         throw new BadRequestException(message);
       }
@@ -35,7 +35,7 @@ export class UsersService {
 
   async findById(id, auth) {
     try {
-      const { message, status } = this.validation(auth, 'view:users');
+      const { message, status } = await this.validation(auth, 'view:users');
       if (!status) {
         throw new BadRequestException(message);
       }
@@ -46,17 +46,29 @@ export class UsersService {
     }
   }
 
-  async update(body: UpdateUserDto, auth) {
-    try {
-      const { id } = this.extractToken(auth);
+  async validation(item, permission: string) {
+    const { id } = this.extractToken(item);
 
-      const user = await this.userModel.findOneAndUpdate({ _id: id }, body, {
-        new: true,
-      });
-      if (user) {
-        return { message: 'updated successfully', status: true };
+    const user = await this.userModel.findById(id);
+
+    if (user && user.permissions && user.permissions.includes(permission)) {
+      return { message: 'success', status: true };
+    }
+
+    return { message: 'Unauthorized', status: false };
+  }
+
+  async update(id, body: UpdateUserDto, auth) {
+    try {
+      const { message, status } = await this.validation(auth, 'edit:user');
+
+      if (status) {
+        return this.userModel.findOneAndUpdate({ _id: id }, body, {
+          new: true,
+        });
       }
-      throw new BadRequestException('Unauthorized');
+
+      throw new BadRequestException(message);
     } catch (error) {
       throw new BadRequestException(error.response);
     }
@@ -65,14 +77,14 @@ export class UsersService {
   async delete(id: string, auth) {
     try {
       const { id: userId, permissions } = this.extractToken(auth);
-
-      if (userId !== id) {
-        if (permissions && permissions.includes('delete:user')) {
-          throw new BadRequestException('Unauthorized');
-        }
+      if (
+        (userId !== id && permissions && permissions.includes('delete:user')) ||
+        userId === id
+      ) {
+        await this.userModel.findByIdAndDelete(id);
+        return { message: 'account successfully deleted' };
       }
-      await this.userModel.findByIdAndDelete(id);
-      return { message: 'account successfully deleted' };
+      throw new BadRequestException('Unauthorized');
     } catch (error) {
       throw new BadRequestException(error.response);
     }
@@ -92,15 +104,6 @@ export class UsersService {
     } catch (error) {
       throw new BadRequestException(error.response);
     }
-  }
-
-  validation(item, permission: string) {
-    const { permissions } = this.extractToken(item);
-
-    if (permissions && permissions.includes(permission)) {
-      return { message: 'success', status: true };
-    }
-    return { message: 'Unauthorized', status: false };
   }
 
   async register(body: UserDto) {
@@ -143,7 +146,6 @@ export class UsersService {
         {
           id: validEmail._id,
           role: validEmail.role,
-          username: validEmail.username,
           permissions: validEmail.permissions,
         },
         { expiresIn: '8h' },

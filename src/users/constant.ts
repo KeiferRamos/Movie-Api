@@ -30,6 +30,7 @@ export const adminPermission = [
   'delete:user',
   'view:users',
   'view:movie',
+  'edit:user',
 ];
 
 export const developerPermission = [

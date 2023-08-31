@@ -37,7 +37,11 @@ export class GenresController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  updateGenre(@Param('id') id: string, @Body() body: UpdateGenreDto, userAuth) {
+  updateGenre(
+    @Param('id') id: string,
+    @Body() body: UpdateGenreDto,
+    @Headers() userAuth,
+  ) {
     return this.genreService.update(id, body, userAuth);
   }
 

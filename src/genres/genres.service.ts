@@ -5,6 +5,7 @@ import { Genre } from './interface/genre';
 import { GenreDto } from './dto/genre';
 import { UsersService } from 'src/users/users.service';
 import { getincludes } from 'src/helper';
+import { UpdateGenreDto } from './dto/update-genre';
 
 @Injectable()
 export class GenresService {
@@ -22,12 +23,13 @@ export class GenresService {
     return this.genreModel.findById(id);
   }
 
-  async update(id: string, body: GenreDto, userAuth) {
+  async update(id: string, body: UpdateGenreDto, userAuth) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         userAuth,
-        'update:genre',
+        'edit:genre',
       );
+
       if (!status) {
         throw new BadRequestException(message);
       }
@@ -50,7 +52,7 @@ export class GenresService {
 
   async delete(id: string, userAuth) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         userAuth,
         'delete:genre',
       );
@@ -76,9 +78,9 @@ export class GenresService {
 
   async create(body: GenreDto, userAuth) {
     try {
-      const { message, status } = this.userService.validation(
+      const { message, status } = await this.userService.validation(
         userAuth,
-        'delete:genre',
+        'create:genre',
       );
       if (!status) {
         throw new BadRequestException(message);
