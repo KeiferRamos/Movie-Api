@@ -146,7 +146,6 @@ export class UsersService {
         {
           id: validEmail._id,
           role: validEmail.role,
-          permissions: validEmail.permissions,
         },
         { expiresIn: '8h' },
       ),
