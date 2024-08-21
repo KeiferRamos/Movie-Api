@@ -11,7 +11,12 @@ async function bootstrap() {
   app.useStaticAssets(`${__dirname}/public`);
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-  app.enableCors();
+    app.enableCors({
+    origin: 'https://movie-cms.netlify.app', // replace with your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   await app.listen(PORT);
 }
