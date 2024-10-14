@@ -5,6 +5,14 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+
+    "builds": [
+      { "src": "src/main.ts", "use": "@vercel/node" }
+    ],
+    "routes": [
+      { "src": "/(.*)", "dest": "src/main.ts" }
+    ],
+  
   "scripts": {
     "start": "nest start",
     "build": "nest build",
