@@ -3,10 +3,12 @@ import { Match, RegistrationId, ValidateRole } from '../decorator/decorator';
 
 export class UserDto {
   @IsString()
-  firstName: string;
+  @IsOptional()
+  firstName?: string;
 
   @IsString()
-  lastName: string;
+  @IsOptional()
+  lastName?: string;
 
   @IsOptional()
   @IsString()
